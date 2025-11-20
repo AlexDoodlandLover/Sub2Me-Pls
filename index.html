@@ -1,276 +1,267 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
 <title>Sub2Me Pls</title>
-
 <style>
-  body { background:#0d0d0d; color:white; font-family:Arial; padding:20px; }
-  h2 { margin-top:0; }
-  input, button, select {
-    width:100%; padding:12px; margin:8px 0; border-radius:8px; border:none;
-  }
-  button { background:#ff4747; color:white; font-weight:bold; }
-  #app, #campaignView, #videoWatch, #survey, #createCampaign { display:none; }
-  .card { background:#1c1c1c; padding:12px; margin:12px 0; border-radius:8px; }
+body { margin:0; padding:0; font-family:'Segoe UI',sans-serif; background: linear-gradient(120deg,#ff9a9e,#fad0c4,#fbc2eb); background-size:400% 400%; animation:bgAnim 15s ease infinite;}
+@keyframes bgAnim {0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+header { background: rgba(255,85,85,0.9); color:white; padding:1rem; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.3);}
+.container { max-width:900px; margin:auto; padding:1rem;}
+button { padding:0.5rem 1rem; margin:0.3rem; border:none; border-radius:8px; cursor:pointer; background: linear-gradient(45deg,#ff6a00,#ee0979); color:white; font-weight:bold; transition: transform 0.2s, box-shadow 0.2s;}
+button:hover { transform: translateY(-2px); box-shadow:0 5px 15px rgba(0,0,0,0.3);}
+input { padding:0.5rem; border-radius:6px; border:1px solid #ccc; margin:0.3rem; width:calc(100% - 1.2rem);}
+.campaign { background:white; padding:1rem; margin:1rem 0; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.2); transition: transform 0.2s;}
+.campaign:hover { transform: scale(1.02); box-shadow:0 8px 25px rgba(0,0,0,0.3);}
+#miniGames { background: rgba(255,243,205,0.9); padding:1rem; border-radius:12px; margin-top:1rem;}
+#gameContainer { margin-top:1rem;}
+@keyframes coinPop {0%{transform: scale(0);}50%{transform: scale(1.3);}100%{transform: scale(1);}}
+.coinPop { display:inline-block; animation: coinPop 0.5s ease;}
+#introAnimation {position:fixed;top:0;left:0;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:9999;}
 </style>
 </head>
-
 <body>
 
-<h2>Sub2Me Pls</h2>
-
-<!-- LOGIN UI -->
-<div id="auth">
-  <input id="email" placeholder="Email or Username">
-  <input id="password" type="password" placeholder="Password">
-  <button id="signupBtn">Sign Up</button>
-  <button id="loginBtn">Login</button>
-  <button id="googleBtn" style="background:#4285F4;">Sign in with Google</button>
+<!-- INTRO ANIMATION -->
+<div id="introAnimation">
+  <svg id="svgCanvas" width="400" height="300"></svg>
+  <p id="animationText" style="font-size:1.2rem;margin-top:1rem;">Checking YouTube Subscribers...</p>
 </div>
 
-<!-- MAIN APP -->
-<div id="app">
-  <h3>Welcome to Sub2Me Pls 🎉</h3>
-  <p id="coinsDisplay"></p>
+<header><h1>Sub2Me Pls ✨</h1></header>
+<div class="container" id="app">
 
-  <button id="viewCampaigns">View Campaigns</button>
-  <button id="newCampaign">Create Campaign</button>
-  <button id="logoutBtn">Logout</button>
-</div>
+  <!-- LOGIN -->
+  <div id="login" style="display:none;">
+    <h2>Login / Sign Up</h2>
+    <input type="text" id="username" placeholder="Username or Email"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button id="emailLogin">Login / Sign Up</button>
+    <button id="googleLogin">Login with Google</button>
+  </div>
 
-<!-- CAMPAIGN LIST -->
-<div id="campaignView">
-  <h3>Active Campaigns</h3>
-  <div id="campaignList"></div>
-  <button onclick="goHome()">Back</button>
-</div>
+  <!-- DASHBOARD -->
+  <div id="dashboard" style="display:none;">
+    <h2>Welcome <span id="userName"></span></h2>
+    <p>Coins: <span id="coins">50</span></p>
+    <button id="addCampaign">Publish Your Channel</button>
+    <div id="campaigns"></div>
 
-<!-- VIDEO WATCH -->
-<div id="videoWatch">
-  <h3 id="channelName"></h3>
-  <p>Watch the videos below:</p>
-  <div id="videoList"></div>
-  <button onclick="finishVideos()">Done Watching</button>
-</div>
-
-<!-- SURVEY -->
-<div id="survey">
-  <h3>Did this channel fit your vibe?</h3>
-  <select id="vibeSelect">
-    <option value="yes">Yup, I liked it</option>
-    <option value="no">Not really</option>
-  </select>
-  <input id="surveyDesc" placeholder="What went wrong, or what did you like?">
-  <button onclick="submitSurvey()">Submit</button>
-</div>
-
-<!-- CREATE CAMPAIGN -->
-<div id="createCampaign">
-  <h3>Create a Campaign</h3>
-  <input id="channelID" placeholder="Enter YouTube Channel ID">
-  <input id="subGoal" placeholder="Desired Subscribers (100 coins = 100 subs)">
-  <button id="createBtn">Create</button>
-  <button onclick="goHome()">Cancel</button>
+    <!-- MINI GAMES -->
+    <div id="miniGames">
+      <h3>Mini-Games</h3>
+      <button onclick="showGame('catcher')">CoinCatcher</button>
+      <button onclick="showGame('clicker')">CoinClicker</button>
+      <button onclick="showGame('guess')">GuessTheYouTubeVideo</button>
+      <button onclick="showGame('era')">GuessTheYouTubeEra</button>
+      <div id="gameContainer"></div>
+    </div>
+  </div>
 </div>
 
 <script type="module">
-  /* ------------------------ FIREBASE IMPORTS ------------------------ */
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-  import { 
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    GoogleAuthProvider,
-    signInWithPopup,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-  import { 
-    getFirestore,
-    doc,
-    setDoc,
-    getDoc,
-    updateDoc,
-    collection,
-    getDocs,
-    addDoc
-  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+// ---------------- FIREBASE ----------------
+const firebaseConfig = {
+  apiKey: "AIzaSyDslpBSIz_bl_RxNmAuCUYTrrP0OsQI89c",
+  authDomain: "sub2me-pls.firebaseapp.com",
+  projectId: "sub2me-pls",
+  storageBucket: "sub2me-pls.firebasestorage.app",
+  messagingSenderId: "137292027414",
+  appId: "1:137292027414:web:495ac4da8bcc7109800737",
+  measurementId: "G-HLH74P7D5J"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
 
-  /* ------------------------ FIREBASE CONFIG ------------------------ */
-  const firebaseConfig = {
-    apiKey: "AIzaSyDslpBSIz_bl_RxNmAuCUYTrrP0OsQI89c",
-    authDomain: "sub2me-pls.firebaseapp.com",
-    projectId: "sub2me-pls",
-    storageBucket: "sub2me-pls.firebasestorage.app",
-    messagingSenderId: "137292027414",
-    appId: "1:137292027414:web:495ac4da8bcc7109800737",
-    measurementId: "G-HLH74P7D5J"
-  };
+// ---------------- STATE ----------------
+const loginDiv = document.getElementById("login");
+const dashboardDiv = document.getElementById("dashboard");
+const userNameSpan = document.getElementById("userName");
+const coinsSpan = document.getElementById("coins");
+const campaignsDiv = document.getElementById("campaigns");
+let coins = 50;
+const gameContainer = document.getElementById("gameContainer");
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth();
-  const db = getFirestore();
+// ---------------- LOGIN ----------------
+document.getElementById("emailLogin").onclick = async ()=>{
+  const u=document.getElementById("username").value;
+  const p=document.getElementById("password").value;
+  try{ await signInWithEmailAndPassword(auth,u,p); }
+  catch{ await createUserWithEmailAndPassword(auth,u,p); }
+};
+document.getElementById("googleLogin").onclick = async ()=>{ try{ await signInWithPopup(auth,provider); } catch(e){ console.error(e);} };
 
-  /* ------------------------ YOUTUBE API ------------------------ */
-  const YT_API_KEY = "AIzaSyCCoUFdxXyECGjo_Rc6P5LdGSudpo1FFwk";
+// ---------------- AUTH ----------------
+onAuthStateChanged(auth,user=>{
+  if(user){
+    loginDiv.style.display="none";
+    dashboardDiv.style.display="block";
+    userNameSpan.textContent=user.displayName||user.email;
+    coinsSpan.textContent=coins;
+    loadCampaigns();
+  } else { loginDiv.style.display="block"; dashboardDiv.style.display="none"; }
+});
 
-  async function fetchChannel(id) {
-    const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${id}&key=${YT_API_KEY}`
-    );
-    return (await res.json()).items[0];
-  }
-
-  async function fetchVideos(id) {
-    const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${id}&maxResults=10&order=date&key=${YT_API_KEY}`
-    );
-    return (await res.json()).items;
-  }
-
-  /* ------------------------ AUTH LOGIC ------------------------ */
-  signupBtn.onclick = async () => {
-    await createUserWithEmailAndPassword(auth, email.value, password.value);
-    await setDoc(doc(db, "users", auth.currentUser.uid), {
-      coins: 50
-    });
-  };
-
-  loginBtn.onclick = () => {
-    signInWithEmailAndPassword(auth, email.value, password.value);
-  };
-
-  googleBtn.onclick = () => {
-    signInWithPopup(auth, new GoogleAuthProvider());
-  };
-
-  logoutBtn.onclick = () => signOut(auth);
-
-  /* ------------------------ AUTH STATE ------------------------ */
-  onAuthStateChanged(auth, async user => {
-    if (user) {
-      auth.style.display = "none";
-      app.style.display = "block";
-      const snap = await getDoc(doc(db, "users", user.uid));
-      document.getElementById("coinsDisplay").innerText =
-        "Coins: " + snap.data().coins;
-    } else {
-      auth.style.display = "block";
-      app.style.display = "none";
-    }
+// ---------------- CAMPAIGNS ----------------
+async function loadCampaigns(){
+  campaignsDiv.innerHTML="<h3>Active Campaigns</h3>";
+  const qs=await getDocs(collection(db,"campaigns"));
+  qs.forEach(docSnap=>{
+    const d=docSnap.data();
+    const div=document.createElement("div");
+    div.className="campaign";
+    div.innerHTML=`<strong>${d.channelName}</strong> - Cost: ${d.cost} coins
+      <br><iframe width="300" height="169" src="https://www.youtube.com/embed/${d.videoId}" frameborder="0" allowfullscreen></iframe>
+      <br><button onclick="watchCampaign('${docSnap.id}','${d.videoId}')">Watch & Feedback</button>`;
+    campaignsDiv.appendChild(div);
   });
+}
+document.getElementById("addCampaign").onclick=async()=>{
+  const c=prompt("Enter your YouTube channel name:");
+  const v=prompt("Enter a video ID from your channel:");
+  if(!c||!v) return;
+  await addDoc(collection(db,"campaigns"),{channelName:c,videoId:v,cost:100});
+  alert("Campaign submitted! Refresh to see it.");
+};
 
-  /* ------------------------ CAMPAIGNS ------------------------ */
-  viewCampaigns.onclick = async () => {
-    app.style.display = "none";
-    campaignView.style.display = "block";
+// ---------------- WATCH CAMPAIGN ----------------
+window.watchCampaign=async(docId,videoId)=>{
+  alert("Watch the video and answer feedback!");
+  const vibe=prompt("Did this fit your vibe? yes/no");
+  const enjoyment=prompt("How much did you enjoy it? 1-10");
+  alert("Thanks! You earned 10 coins!");
+  coins+=10; coinsSpan.textContent=coins;
+};
 
-    const list = document.getElementById("campaignList");
-    list.innerHTML = "";
+// ---------------- MINI-GAMES ----------------
+let currentAnswer="";
+function showGame(game){
+  gameContainer.innerHTML="";
+  if(game==='catcher'){ startCoinCatcher(); }
+  else if(game==='clicker'){ startCoinClicker(); }
+  else if(game==='guess'){ startGuessTheYouTubeVideo(); }
+  else if(game==='era'){ startGuessTheYouTubeEra(); }
+}
 
-    const snap = await getDocs(collection(db, "campaigns"));
-    snap.forEach(c => {
-      const data = c.data();
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `
-        <h4>${data.channelName}</h4>
-        <button onclick="startWatching('${data.channelId}')">View Videos</button>
-      `;
-      list.appendChild(div);
-    });
+// ----------- CoinCatcher -----------
+function startCoinCatcher(){
+  gameContainer.innerHTML=`<p>Click the falling coin before it hits the bottom!</p>
+    <div id="fallingCoins" style="position:relative;height:200px;background:#eee;"></div>`;
+  const area=document.getElementById("fallingCoins");
+  let score=0;
+  const coin=document.createElement("div");
+  coin.textContent="🪙";
+  coin.style.position="absolute"; coin.style.top="0px"; coin.style.left=Math.random()*200+"px"; coin.style.fontSize="2rem"; coin.style.cursor="pointer";
+  area.appendChild(coin);
+  const interval=setInterval(()=>{
+    let t=parseInt(coin.style.top);
+    if(t>180){ clearInterval(interval); coin.remove(); alert("Game over! Coins earned: "+score); coins+=score; coinsSpan.textContent=coins; return; }
+    coin.style.top=(t+10)+"px";
+  },300);
+  coin.onclick=()=>{
+    score+=5; coin.remove(); clearInterval(interval); startCoinCatcher();
+  }
+}
+
+// ----------- CoinClicker -----------
+function startCoinClicker(){
+  gameContainer.innerHTML=`<p>Click the giant coin as fast as possible!</p>
+    <button id="clickCoin" style="font-size:2rem;padding:2rem;">🪙</button>
+    Coins earned: <span id="clickerCoins">0</span>`;
+  let clickScore=0;
+  document.getElementById("clickCoin").onclick=()=>{
+    let e=Math.floor(Math.random()*5+1);
+    clickScore+=e; coins+=e; document.getElementById("clickerCoins").textContent=clickScore; coinsSpan.textContent=coins;
   };
+}
 
-  newCampaign.onclick = () => {
-    app.style.display = "none";
-    createCampaign.style.display = "block";
-  };
+// ----------- GuessTheYouTubeVideo -----------
+const API_KEY="AIzaSyCCoUFdxXyECGjo_Rc6P5LdGSudpo1FFwk";
+const popularChannels=["UCX6OQ3DkcsbYNE6H8uQQuVA","UC-lHJZR3Gqxm24_Vd_AJ5Yw","UCi7GJNg51Cpnr0kW8o4V5Q"];
+async function fetchRandomVideo(){
+  const ch=popularChannels[Math.floor(Math.random()*popularChannels.length)];
+  const res=await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${ch}&part=snippet,id&order=date&maxResults=5`);
+  const data=await res.json();
+  const vid=data.items[Math.floor(Math.random()*data.items.length)];
+  return {title:vid.snippet.title,videoId:vid.id.videoId,hint:generateHint(vid.snippet.title)};
+}
+function generateHint(title){ return title.split(" ").filter(w=>!["the","a","an","and","of","in","on"].includes(w.toLowerCase())).slice(0,3).join(" ")+" ...?"; }
+async function startGuessTheYouTubeVideo(){
+  const video=await fetchRandomVideo();
+  currentAnswer=video.title.toLowerCase();
+  const brainrot = Math.random()<0.25;
+  const hintText = brainrot ? "💀 brainrot 💀" : video.hint;
+  gameContainer.innerHTML=`<p>Guess the video from the hint:</p><div id="guessHint">${hintText}</div>
+    <input type="text" id="guessAnswer" placeholder="Your answer">
+    <button onclick="submitGuess()">Submit</button>
+    <p id="guessResult"></p>`;
+}
+window.submitGuess=()=>{
+  const ans=document.getElementById("guessAnswer").value.toLowerCase();
+  if(ans===currentAnswer){document.getElementById("guessResult").textContent="Correct! +20 coins!"; coins+=20;}
+  else{document.getElementById("guessResult").textContent="Wrong! Try again!";}
+  coinsSpan.textContent=coins;
+}
 
-  createBtn.onclick = async () => {
-    const cid = channelID.value;
-    const subs = Number(subGoal.value);
+// ----------- GuessTheYouTubeEra -----------
+const eras=[
+  {range:"2005-2007",hint:"Low-res webcams, cat videos, early meme culture, shaky homemade content."},
+  {range:"2008-2010",hint:"Intro edits, Let’s Plays, funny fail compilations, vlog beginnings."},
+  {range:"2011-2013",hint:"Facecam Let's Plays, tutorial channels, viral challenges emerge."},
+  {range:"2014-2016",hint:"Clickbait thumbnails, polished editing, challenge videos everywhere."},
+  {range:"2017-2019",hint:"High-quality vlogs, memes go viral, gaming highlights, daily uploads."},
+  {range:"2020-2023",hint:"Shorts dominate, TikTok-style edits, reaction videos, rapid trends."}
+];
+function startGuessTheYouTubeEra(){
+  const era=eras[Math.floor(Math.random()*eras.length)];
+  currentAnswer=era.range;
+  const brainrot = Math.random()<0.25;
+  const hintText = brainrot ? "💀 brainrot 💀" : era.hint;
+  gameContainer.innerHTML=`<p>Guess the YouTube era (e.g., 2005-2007):</p>
+    <div id="eraHint">${hintText}</div>
+    <input type="text" id="eraAnswer" placeholder="Your guess">
+    <button onclick="submitEra()">Submit</button>
+    <p id="eraResult"></p>`;
+}
+window.submitEra=()=>{
+  const ans=document.getElementById("eraAnswer").value;
+  if(ans===currentAnswer){document.getElementById("eraResult").textContent="Correct! +20 coins!"; coins+=20;}
+  else{document.getElementById("eraResult").textContent="Wrong! Try again!";}
+  coinsSpan.textContent=coins;
+};
 
-    const user = auth.currentUser;
-    const userData = await getDoc(doc(db, "users", user.uid));
-
-    if (userData.data().coins < subs) {
-      alert("Not enough coins 👀");
-      return;
+// ----------------- INTRO SVG ANIMATION -----------------
+function runIntroAnimation(callback){
+  const svg = document.getElementById("svgCanvas");
+  const text = document.getElementById("animationText");
+  svg.innerHTML = `<circle cx="200" cy="150" r="50" fill="#fbc2eb" /><rect x="150" y="210" width="100" height="40" fill="#ff6a00" rx="8" />`;
+  let step = 0;
+  const steps = [
+    ()=>{ text.textContent = "Oh no! Only 10 subscribers... 😢"; },
+    ()=>{ text.textContent = "Discovering Sub2Me Pls! 🚀"; },
+    ()=>{ text.textContent = "Launching campaign... 💥"; },
+    ()=>{ text.textContent = "BOOM! 1,000 subscribers gained! 🎉"; coins+=1000; coinsSpan.textContent=coins; }
+  ];
+  const interval = setInterval(()=>{
+    if(step>=steps.length){ clearInterval(interval); 
+      document.getElementById("introAnimation").style.display="none";
+      callback(); return;
     }
+    steps[step](); step++;
+  },1500);
+}
 
-    const channel = await fetchChannel(cid);
+if(!localStorage.getItem("introPlayed")){
+  runIntroAnimation(()=>{ document.getElementById("login").style.display="block"; });
+  localStorage.setItem("introPlayed","true");
+} else { document.getElementById("login").style.display="block"; }
 
-    await addDoc(collection(db, "campaigns"), {
-      channelId: cid,
-      channelName: channel.snippet.title,
-      creator: user.uid
-    });
-
-    await updateDoc(doc(db, "users", user.uid), {
-      coins: userData.data().coins - subs
-    });
-
-    alert("Campaign created!");
-    goHome();
-  };
-
-  /* ------------------------ WATCH VIDEOS ------------------------ */
-  window.startWatching = async (cid) => {
-    campaignView.style.display = "none";
-    videoWatch.style.display = "block";
-
-    const videos = await fetchVideos(cid);
-    channelName.innerText = "Channel Videos";
-
-    const list = document.getElementById("videoList");
-    list.innerHTML = "";
-
-    videos.forEach(v => {
-      const vid = document.createElement("div");
-      vid.className = "card";
-      vid.innerHTML = `
-        <p>${v.snippet.title}</p>
-        <iframe width="100%" height="200"
-          src="https://www.youtube.com/embed/${v.id.videoId}">
-        </iframe>
-      `;
-      list.appendChild(vid);
-    });
-  };
-
-  window.finishVideos = () => {
-    videoWatch.style.display = "none";
-    survey.style.display = "block";
-  };
-
-  /* ------------------------ SURVEY ------------------------ */
-  window.submitSurvey = async () => {
-    const vibe = vibeSelect.value;
-    const desc = surveyDesc.value;
-
-    alert("Thanks! Coins +10");
-
-    const user = auth.currentUser;
-    const snap = await getDoc(doc(db, "users", user.uid));
-
-    await updateDoc(doc(db, "users", user.uid), {
-      coins: snap.data().coins + 10
-    });
-
-    goHome();
-  };
-
-  /* ------------------------ UTIL ------------------------ */
-  window.goHome = () => {
-    campaignView.style.display = "none";
-    videoWatch.style.display = "none";
-    survey.style.display = "none";
-    createCampaign.style.display = "none";
-    app.style.display = "block";
-  };
 </script>
-
 </body>
 </html>
